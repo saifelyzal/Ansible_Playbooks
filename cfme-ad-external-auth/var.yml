@@ -1,0 +1,4 @@
+domain: dev.example.local
+domainuser: Administrator
+passwd: ***********
+domainip: 192.168.122.173
