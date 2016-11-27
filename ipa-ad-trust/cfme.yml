@@ -1,0 +1,17 @@
+ - hosts: all
+   handlers:
+   - name: clean sssd caches
+     shell: "systemctl stop sssd && sss_cache -E && rm -f /var/lib/sssd/db/* && systemctl start sssd"
+     ignore_errors: yes
+   tasks:
+   - name: enabling DNS lookup for AD domain
+     replace:
+      dest: /etc/krb5.conf
+      regexp: '  dns_lookup_kdc = false'
+      replace: '  dns_lookup_kdc = true'
+      backup: yes
+   - replace:
+      dest: /etc/krb5.conf
+      regexp: '  dns_lookup_realm(\s+.*)?$'
+      replace: '  dns_lookup_realm = true'
+     notify: clean sssd caches
