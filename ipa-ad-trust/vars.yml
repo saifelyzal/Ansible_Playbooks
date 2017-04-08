@@ -1,0 +1,6 @@
+IPAServername: ipa.idm.example.int
+Domainname: idm.example.int
+admin_passwd: **********
+ad_admin_passwd: ********
+ad_domain: ad.example.int
+ad_ip_address: 192.168.1.79

@@ -1,0 +1,76 @@
+ - hosts: all
+   vars_files:
+    - vars.yml
+   handlers:
+   - name: restart sssd
+     service:
+      name: sssd
+      state: restarted
+   - name: restart ipa
+     service:
+      name: ipa.service
+      state: restarted
+   tasks:
+   - name: Installing IPA Server
+     yum:
+      name: '{{ item }}'
+      state: installed
+     with_items:
+      - ipa-server
+      - ipa-server-trust-ad
+      - bind
+      - bind-dyndb-ldap
+      - ipa-server-dns
+      - sssd-dbus
+   - name: Disabling IPV6
+     sysctl:
+      name: "net.ipv6.conf.all.disable_ipv6"
+      value: 1
+      reload: yes
+   - name: setting the IPA Server hostname
+     shell: 'hostnamectl set-hostname {{ IPAServername }}'
+   - name: updating hosts file with IPA Server hostname, and IP
+     lineinfile:
+      dest: /etc/hosts
+      line: '{{ ansible_eth0.ipv4.address }}   {{ IPAServername }}'
+      backup: yes
+   - name: Configuring IPA Server
+     shell: 'ipa-server-install -N -U -a "{{ admin_passwd }}" -p "{{ admin_passwd }}" --domain="{{ Domainname }}" --realm="{{ Domainname|upper }}" --mkhomedir --setup-dns --no-forwarders --no-dnssec-validation --no-host-dns --ip-address="{{ ansible_eth0.ipv4.address }}"'
+     ignore_errors: yes
+   - name: Disabling DNSSEC
+     replace:
+      dest: /etc/named.conf
+      backup: yes
+      replace: 'dnssec-validation no;'
+      regexp: '^dnssec-validation(\s+.*)?$'
+   - name: Setting IPA netbios
+     shell: 'echo "{{ admin_passwd }}" | kinit admin'
+   - shell: 'ipa-adtrust-install --netbios-name="{{ ansible_hostname|upper }}" -a "{{ admin_passwd }}" -U'
+   - name: Configuring Forward DNS zone for AD Domain
+     shell: 'ipa dnsforwardzone-add "{{ ad_domain }}" --forwarder="{{ ad_ip_address }}" --forward-policy=only'
+     ignore_errors: yes
+   - name: updating sssd to get ldap users attributes from AD domain
+     lineinfile:
+      dest: /etc/sssd/sssd.conf
+      line: 'ldap_user_extra_attrs = mail, givenname, sn, displayname'
+      insertbefore: "^cache_credentials"
+      backup: yes
+   - replace:
+       dest: /etc/sssd/sssd.conf
+       backup: yes
+       regexp: '^services(\s+.*)?$'
+       replace: 'services = nss, sudo, pam, ssh, ifp'
+   #- name: cleaning sssd caches
+    # shell: "sss_cache -E  &&  rm -f  /var/lib/sss/db/*"
+   - name: updating sssd to get ldap users attributes from AD domain
+     blockinfile:
+      dest: /etc/sssd/sssd.conf
+      block: |
+             allowed_uids = apache, root
+             user_attributes = +mail, +givenname, +sn, +displayname
+      insertafter: "[ifp]"
+     notify: restart ipa
+   - name: waiting for IPA server to restart
+     pause: minutes=5
+   - name: Adding AD trust
+     shell: 'echo "{{ ad_admin_passwd }}"|ipa trust-add --type=ad "{{ ad_domain }}" --admin Administrator --password'

@@ -1,0 +1,30 @@
+# Playbook to create IPA user, and change the expiration date for the user in order to disable the password force change
+ - hosts: ipa
+   vars_prompt:
+    - name: "adminpass"
+      prompt: "Enter Admin password"
+    - name: "username"
+      prompt: "Enter the new username"
+      private: no
+    - name: "userpassword"
+      prompt: "Enter the new user password"
+   tasks:
+   - name: Getting IPA admin krb ticket
+     shell: 'echo "{{ adminpass }}" | kinit admin'
+   - name: Creating IPA User "{{ username }}"
+     shell: 'echo "{{ userpassword }}"|ipa user-add --first="{{ username }}" --last="{{ username }}" "{{ username }}" --password'
+   - name: Adding ldif file
+     blockinfile:
+      create: yes
+      dest: /root/user.ldif
+      block: |
+       dn: uid={{username}},cn=users,cn=accounts,dc=idm,dc=example,dc=int
+       changetype: modify
+       replace: krbPasswordExpiration
+       krbPasswordExpiration: 20380119031407Z
+   - name: Changing the expiration date for "{{ username }}" user
+     shell: 'ldapmodify -x -D "cn=Directory Manager" -w "{{ adminpass }}"  -v -f user.ldif'
+   - name: Cleaning the ldif file
+     file:
+      dest: /root/user.ldif
+      state: absent
