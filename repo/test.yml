@@ -1,4 +1,4 @@
  - hosts: all
    tasks: 
    - name: Testing 
-     shell: "echo $(date) >> /tmp/date.txt"
+     shell: "id"
