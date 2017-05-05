@@ -1,6 +1,4 @@
  - hosts: all
-   vars_files: 
-     - var.yml
    handlers:
    - name: restart httpd
      service:
