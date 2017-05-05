@@ -2,3 +2,6 @@
    tasks: 
    - name: Testing 
      shell: "id"
+     register: id
+   - debug:
+      var: id
