@@ -13,7 +13,7 @@
    - name: Adding the domain to the hosts file 
      lineinfile:
       dest: /etc/hosts
-      line: "'{{ domainip }}' '{{ domain }}'"
+      line: "{{ domainip }} {{ domain }}"
       backup: yes
    - name: joining CFME to the domain
      shell: 'echo "{{ passwd }}"| realm join "{{ domain }}" -U "{{ domainuser }}"'
