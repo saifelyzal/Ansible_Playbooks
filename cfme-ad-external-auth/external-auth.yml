@@ -1,4 +1,5 @@
  - hosts: all
+   become: true
    handlers:
    - name: restart httpd
      service:
