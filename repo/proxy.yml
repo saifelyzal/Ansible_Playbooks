@@ -1,0 +1,10 @@
+ - hosts: localhost
+   connection: local
+#   vars:
+#    proxy: http://192.168.122.162:3128
+   environment:
+    http_proxy: "{{ proxy }}"
+   tasks:
+   - name: testing proxy
+     uri:
+      url: http://google.com
