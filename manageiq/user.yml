@@ -1,0 +1,14 @@
+- hosts: localhost
+  tasks:
+  - name: Create a new user in ManageIQ
+    manageiq_user:
+     userid: 'cfme'
+     name: 'CFME Demo'
+     password: 'smartvm'
+     group: 'EvmGroup-user'
+     email: 'cfme@example.com'
+     manageiq_connection:
+      url: 'http://127.0.0.1:3000'
+      username: 'admin'
+      password: 'smartvm'
+      verify_ssl: False
