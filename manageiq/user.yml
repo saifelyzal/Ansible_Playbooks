@@ -2,11 +2,11 @@
   tasks:
   - name: Create a new user in ManageIQ
     manageiq_user:
-     userid: 'cfme'
-     name: 'CFME Demo'
-     password: 'smartvm'
+     userid: "{{ user }}"
+     name: "{{ Fname Lname }}"
+     password: "{{ password }}"
      group: 'EvmGroup-user'
-     email: 'cfme@example.com'
+     email: '{{ user }}@example.com'
      manageiq_connection:
       url: 'http://127.0.0.1:3000'
       username: 'admin'
