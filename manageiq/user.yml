@@ -3,7 +3,7 @@
   - name: Create a new user in ManageIQ
     manageiq_user:
      userid: "{{ user }}"
-     name: "{{ Fname Lname }}"
+     name: "{{ fname }}"
      password: "{{ password }}"
      group: 'EvmGroup-user'
      email: '{{ user }}@example.com'
