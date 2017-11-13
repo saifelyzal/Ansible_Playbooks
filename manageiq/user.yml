@@ -2,11 +2,11 @@
   tasks:
   - name: Create a new user in ManageIQ
     manageiq_user:
-     userid: "{{ dialog_user }}"
-     password: "{{ dialog_password }}"
-     name: "{{ dialog_fname }}"
+     userid: "{{ user }}"
+     password: "{{ password }}"
+     name: "{{ fname }}"
      group: 'EvmGroup-user'
-     email: '{{ dialog_user }}@example.com'
+     email: '{{ user }}@example.com'
      manageiq_connection:
       url: 'http://127.0.0.1:3000'
       username: 'admin'
