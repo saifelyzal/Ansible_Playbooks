@@ -1,0 +1,4 @@
+tower-cli setting modify AUTH_LDAP_SERVER_URI ldap://idm.internal.local
+tower-cli setting modify AUTH_LDAP_BIND_DN uid=tower,cn=users,cn=accounts,dc=internal,dc=local
+tower-cli setting modify AUTH_LDAP_BIND_PASSWORD 'redhat@2019'
+tower-cli setting modify AUTH_LDAP_START_TLS false
